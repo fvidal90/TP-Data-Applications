@@ -35,7 +35,7 @@ class DelayAnomalies(Base):
 def main():
     """Program entrypoint."""
     engine = create_engine(URI, echo=True)
-    Base.metadata.create_all(engine)
+    Base.metadata.create_all(engine, checkfirst=True)
 
 
 if __name__ == "__main__":
