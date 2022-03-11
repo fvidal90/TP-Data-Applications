@@ -18,7 +18,7 @@ from packages.postgres_cli import PostgresClient
 PG_USER = os.getenv("PG_USER")
 PG_PASSWORD = os.getenv("PG_PASSWORD")
 PG_HOST = os.getenv("PG_HOST")
-PG_PORT = os.getenv("PG_PORT")
+PG_PORT = int(os.getenv("PG_PORT"))
 PG_DB = os.getenv("PG_DB")
 
 
@@ -43,7 +43,7 @@ def _get_anomalous_days(ds):
     df_delay = pg.to_frame(f"select * from delay_metrics where date_part('year', fl_date) = {year}")
     df_delay["fl_date"] = pd.to_datetime(df_delay.fl_date)
     df_anomalies = pd.DataFrame()
-    for airport in set(df_delay.origin.values):
+    for airport in sorted(set(df_delay.origin.values)):
         print(f"Getting anomaly days for airport: {airport}")
         clf = IsolationForest(random_state=42, contamination=0.05)
         df_airport = df_delay[df_delay.origin == airport].copy()
@@ -70,7 +70,7 @@ def _plot_anomalous_days(ds):
     join (select * from delay_anomalies where date_part('year', fl_date) = {year}) da
     on dm.fl_date=da.fl_date and dm.origin=da.origin""")
     df_complete["fl_date"] = pd.to_datetime(df_complete.fl_date)
-    for airport in set(df_complete.origin.values):
+    for airport in sorted(set(df_complete.origin.values)):
         print(f"Plotting chart for airport: {airport}")
         df_complete_airport = df_complete[df_complete.origin == airport].copy()
         df_complete_airport.sort_values('fl_date', inplace=True)
