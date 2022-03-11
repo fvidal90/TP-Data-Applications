@@ -45,12 +45,12 @@ def _get_anomalous_days(ds):
     df_anomalies = pd.DataFrame()
     for airport in set(df_delay.origin.values):
         clf = IsolationForest(random_state=42, contamination=0.05)
-        df_airport = df_delay[df_delay.origin == airport]
+        df_airport = df_delay[df_delay.origin == airport].copy()
         delay_count_median = df_airport.dep_delay_count.median()
         X_fit = [[x] for x in df_airport[df_airport.dep_delay_count >= delay_count_median].dep_delay_mean.values]
         clf.fit(X_fit)
         preds = clf.predict(X_fit)
-        df_airport["prediction"] = 1
+        df_airport.loc[:, "prediction"] = 1
         df_airport.loc[df_airport.dep_delay_count >= delay_count_median, 'prediction'] = preds
         df_airport["anomaly"] = df_airport.prediction.apply(lambda x: False if x == 1 else True)
         df_anomalies = pd.concat([df_anomalies, df_airport])
@@ -70,9 +70,9 @@ def _plot_anomalous_days(ds):
     on dm.fl_date=da.fl_date and dm.origin=da.origin""")
     df_complete["fl_date"] = pd.to_datetime(df_complete.fl_date)
     for airport in set(df_complete.origin.values):
-        df_complete_airport = df_complete[df_complete.origin == airport]
+        df_complete_airport = df_complete[df_complete.origin == airport].copy()
         df_complete_airport.sort_values('fl_date', inplace=True)
-        df_anomalies = df_complete_airport[df_complete_airport.anomaly]
+        df_anomalies = df_complete_airport[df_complete_airport.anomaly].copy()
         plt.plot(df_complete_airport["fl_date"], df_complete_airport["dep_delay_count"], c="tab:green",
                  label="Number of flights")
         plt.scatter(df_anomalies["fl_date"], df_anomalies["dep_delay_count"], c="tab:red", label="Anomaly days")
