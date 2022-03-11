@@ -74,9 +74,9 @@ def _plot_anomalous_days(ds):
         df_complete_airport.sort_values('fl_date', inplace=True)
         df_anomalies = df_complete_airport[df_complete_airport.anomaly]
         plt.plot(df_complete_airport["fl_date"], df_complete_airport["dep_delay_count"], c="tab:green",
-                 label="Regular days")
-        plt.scatter(df_anomalies["fl_date"], df_anomalies["dep_delay_count"], c="tab:red", label="Anomalies")
-        plt.legend(loc="upper right", bbox_to_anchor=(0.3, 1.15))
+                 label="Number of flights")
+        plt.scatter(df_anomalies["fl_date"], df_anomalies["dep_delay_count"], c="tab:red", label="Anomaly days")
+        plt.legend(loc="upper right", bbox_to_anchor=(0.35, 1.15))
         plt.title(f'{airport} {year}')
         plt.xlim([datetime(year - 1, 12, 16), datetime(year + 1, 1, 15)])
 
