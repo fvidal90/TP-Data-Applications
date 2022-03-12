@@ -28,8 +28,8 @@ aws ssm get-parameter --name /aws/reference/secretsmanager/pg_credentials --quer
 export $(xargs <.env_pg)
 rm .env_pg
 
-echo -e """AIRFLOW_UID=$(id -u)
-nAIRFLOW_GID=0
+echo -e """AIRFLOW_UID=1000
+AIRFLOW_GID=0
 PG_PORT=$PG_PORT
 PG_USER=$PG_USER
 PG_PASSWORD=$PG_PASSWORD
