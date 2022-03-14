@@ -27,11 +27,16 @@ git clone "https://$GITHUB_TOKEN@github.com/$GITHUB_USER/TP-Data-Applications.gi
 cd TP-Data-Applications
 git checkout $GITHUB_BRANCH
 
+replaces="s/username=/PG_USER=/;"\
+"s/password=/PG_PASSWORD=/;"\
+"s/engine=/PG_ENGINE=/;"\
+"s/host=/PG_HOST=/;"\
+"s/port=/PG_PORT=/;"\
+"s/dbname=/PG_DB=/;"\
+"s/dbInstanceIdentifier=/PG_dbInstanceIdentifier=/"
 aws ssm get-parameter --name /aws/reference/secretsmanager/pg_credentials \
     --query 'Parameter.Value'  --with-decryption --output text --region us-east-1 | \
-    jq -r 'to_entries|map("\(.key)=\(.value|tostring)")|.[]' | \
-    sed "s/username=/PG_USER=/;s/password=/PG_PASSWORD=/;s/engine=/PG_ENGINE=/;s/host=/PG_HOST=/;s/port=/PG_PORT=/;s/dbname=/PG_DB=/;s/dbInstanceIdentifier=/PG_dbInstanceIdentifier=/" \
-    > .env_pg
+    jq -r 'to_entries|map("\(.key)=\(.value|tostring)")|.[]' | sed $replaces > .env_pg
 export $(xargs <.env_pg)
 rm .env_pg
 
