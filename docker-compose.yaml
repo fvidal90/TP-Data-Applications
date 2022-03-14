@@ -56,6 +56,7 @@ x-airflow-common:
     AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: 'true'
     AIRFLOW__CORE__LOAD_EXAMPLES: 'false'
     AIRFLOW__API__AUTH_BACKEND: 'airflow.api.auth.backend.basic_auth'
+    AIRFLOW__CORE__MAX_ACTIVE_RUNS_PER_DAG: 2
     PG_USER: ${PG_USER}
     PG_PASSWORD: ${PG_PASSWORD}
     PG_HOST: ${PG_HOST}
