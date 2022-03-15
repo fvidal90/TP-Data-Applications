@@ -49,8 +49,8 @@ PG_HOST=$PG_HOST
 PG_DB=$PG_DB""" > .env
 export $(xargs <.env)
 
-pip3 install sqlalchemy==1.4.31
 pip3 install psycopg2-binary==2.9.3
+pip3 install sqlalchemy==1.4.31
 python3 create_tables.py
 
 service docker start
