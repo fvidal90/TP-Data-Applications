@@ -17,6 +17,7 @@ Base = declarative_base()
 
 class DelayMetrics(Base):
     """Delay metrics data model."""
+
     __tablename__ = "delay_metrics"
     fl_date = Column(Date, primary_key=True)
     origin = Column(String, primary_key=True)
@@ -26,6 +27,7 @@ class DelayMetrics(Base):
 
 class DelayAnomalies(Base):
     """Delay anomalies data model."""
+
     __tablename__ = "delay_anomalies"
     fl_date = Column(Date, primary_key=True)
     origin = Column(String, primary_key=True)

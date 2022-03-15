@@ -97,9 +97,7 @@ class PostgresClient:
             connection = self._connect()
         return connection.execute(sql)
 
-    def insert_from_frame(
-        self, df, table, if_exists="append", index=False, **kwargs
-    ):
+    def insert_from_frame(self, df, table, if_exists="append", index=False, **kwargs):
         """Inserts a pandas DataFrame into the DB.
 
         Parameters
@@ -115,9 +113,7 @@ class PostgresClient:
         """
         connection = self._connect()
         with connection:
-            df.to_sql(
-                table, connection, if_exists=if_exists, index=index, **kwargs
-            )
+            df.to_sql(table, connection, if_exists=if_exists, index=index, **kwargs)
 
     def to_frame(self, *args, **kwargs):
         """Executes a SQL query and returns a DataFrame.
