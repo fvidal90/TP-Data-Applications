@@ -1,16 +1,15 @@
 """Stocks dag."""
-from datetime import datetime
 import os
+from datetime import datetime
 
-from airflow.models import DAG
-from airflow.operators.python import PythonOperator
 import boto3
 import pandas as pd
 import sqlalchemy
-
+from airflow.models import DAG
+from airflow.operators.python import PythonOperator
 from packages.postgres_cli import PostgresClient
-from packages.utils import extract_year, get_anomalous_days_airport, plot_chart_airport
-
+from packages.utils import (extract_year, get_anomalous_days_airport,
+                            plot_chart_airport)
 
 PG_USER = os.getenv("PG_USER")
 PG_PASSWORD = os.getenv("PG_PASSWORD")

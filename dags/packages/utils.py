@@ -2,8 +2,8 @@ import io
 from datetime import datetime
 
 import matplotlib.pyplot as plt
-from sklearn.ensemble import IsolationForest
 import s3fs
+from sklearn.ensemble import IsolationForest
 
 
 def extract_year(ds):

@@ -1,8 +1,8 @@
 import os
 
-from sqlalchemy import create_engine, Column, Integer, String, Date, Float, Boolean
+from sqlalchemy import (Boolean, Column, Date, Float, Integer, String,
+                        create_engine)
 from sqlalchemy.orm import declarative_base
-
 
 PG_USER = os.getenv("PG_USER")
 PG_PASSWORD = os.getenv("PG_PASSWORD")
