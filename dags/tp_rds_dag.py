@@ -19,7 +19,6 @@ PG_DB = os.getenv("PG_DB")
 
 
 def _get_delay_average_and_count(ds, bucket="flights-fer"):
-    pg = PostgresClient(PG_HOST, PG_PORT, PG_USER, PG_PASSWORD, PG_DB)
     year = extract_year(ds)
     s3_client = boto3.client("s3")
     response = s3_client.get_object(Bucket=bucket, Key=f"raw/{year}.csv")
@@ -31,6 +30,8 @@ def _get_delay_average_and_count(ds, bucket="flights-fer"):
         .reset_index()
     )
     df_metrics.columns = ["fl_date", "origin", "dep_delay_mean", "dep_delay_count"]
+
+    pg = PostgresClient(PG_HOST, PG_PORT, PG_USER, PG_PASSWORD, PG_DB)
     try:
         pg.insert_from_frame(df_metrics, "delay_metrics")
     except sqlalchemy.exc.IntegrityError:
@@ -38,8 +39,8 @@ def _get_delay_average_and_count(ds, bucket="flights-fer"):
 
 
 def _get_anomalous_days(ds):
-    pg = PostgresClient(PG_HOST, PG_PORT, PG_USER, PG_PASSWORD, PG_DB)
     year = extract_year(ds)
+    pg = PostgresClient(PG_HOST, PG_PORT, PG_USER, PG_PASSWORD, PG_DB)
     df_delay = pg.to_frame(
         f"select * from delay_metrics where date_part('year', fl_date) = {year}"
     )
@@ -48,8 +49,9 @@ def _get_anomalous_days(ds):
     for airport in sorted(set(df_delay.origin.values)):
         df_airport = get_anomalous_days_airport(df_delay, airport)
         df_anomalies = pd.concat([df_anomalies, df_airport])
+
+    pg = PostgresClient(PG_HOST, PG_PORT, PG_USER, PG_PASSWORD, PG_DB)
     try:
-        pg = PostgresClient(PG_HOST, PG_PORT, PG_USER, PG_PASSWORD, PG_DB)
         pg.insert_from_frame(
             df_anomalies[["fl_date", "origin", "anomaly"]], "delay_anomalies"
         )
