@@ -62,7 +62,7 @@ def plot_chart_airport(df, airport, year):
         df_anomalies["fl_date"],
         df_anomalies["dep_delay_count"],
         c="tab:red",
-        label="Anomaly days",
+        label="Anomaly",
     )
     plt.legend(loc="upper right", bbox_to_anchor=(0.35, 1.15))
     plt.title(f"{airport} {year}")
