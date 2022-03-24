@@ -31,7 +31,7 @@ def _get_delay_average_and_count(ds, bucket="flights-fer"):
         .agg({"DEP_DELAY": ["count", "mean"]})
         .reset_index()
     )
-    df_metrics.columns = ["fl_date", "origin", "dep_delay_count", "dep_delay_mean"]
+    df_metrics.columns = ["fl_date", "origin", "number_of_flights", "dep_delay_mean"]
 
     pg = PostgresClient(PG_HOST, PG_PORT, PG_USER, PG_PASSWORD, PG_DB)
     try:

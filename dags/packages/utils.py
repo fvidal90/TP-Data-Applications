@@ -48,18 +48,18 @@ def get_anomaly_days_airport(
     print(f"Getting anomaly days for airport: {airport}")
     clf = model(random_state=random_state, contamination=contamination)
     df_airport = df[df.origin == airport].copy()
-    delay_count_median = df_airport.dep_delay_count.median()
+    median_of_flights = df_airport.number_of_flights.median()
     x_fit = [
         [x]
         for x in df_airport[
-            df_airport.dep_delay_count >= delay_count_median
+            df_airport.number_of_flights >= median_of_flights
         ].dep_delay_mean.values
     ]
     clf.fit(x_fit)
     predictions = clf.predict(x_fit)
     df_airport.loc[:, "prediction"] = 1
     df_airport.loc[
-        df_airport.dep_delay_count >= delay_count_median, "prediction"
+        df_airport.number_of_flights >= median_of_flights, "prediction"
     ] = predictions
     df_airport["anomaly"] = df_airport.prediction.apply(
         lambda x: False if x == 1 else True
@@ -87,13 +87,13 @@ def get_chart_airport(df, airport, year, bucket):
     df_anomalies = df_complete_airport[df_complete_airport.anomaly].copy()
     plt.plot(
         df_complete_airport["fl_date"],
-        df_complete_airport["dep_delay_count"],
+        df_complete_airport["number_of_flights"],
         c="tab:green",
         label="Number of flights",
     )
     plt.scatter(
         df_anomalies["fl_date"],
-        df_anomalies["dep_delay_count"],
+        df_anomalies["number_of_flights"],
         c="tab:red",
         label="Anomaly",
     )
