@@ -1,23 +1,23 @@
-"""Implements a parent client class to interact with any DB."""
+"""Implements a client class to interact with Postgres DB."""
 import pandas as pd
 from sqlalchemy import create_engine
 
 
 class PostgresClient:
-    """Parent class to connect to a DB using SQLAlchemy.
+    """Class to connect to a Postgres DB using SQLAlchemy.
 
     Attributes
     ----------
         host: str
-            dns name of the host of the postgres database.
+            Dns name of the host of the postgres database.
         port: int
-            port where the postgres database is listening.
+            Port where the postgres database is listening.
         user: str
-            username to connect to the postgres database.
+            Username to connect to the postgres database.
         password: str
-            password for this username.
+            Password for this username.
         database: str
-            database to connect.
+            Database to connect.
     """
 
     def __init__(self, host, port, user, password, database):
@@ -25,16 +25,16 @@ class PostgresClient:
 
         Parameters
         ----------
-        host: str
-            dns name of the host of the postgres database.
-        port: int
-            port where the postgres database is listening.
-        user: str
-            username to connect to the postgres database.
-        password: str
-            password for this username.
-        database: str
-            database to connect.
+            host: str
+                Dns name of the host of the postgres database.
+            port: int
+                Port where the postgres database is listening.
+            user: str
+                Username to connect to the postgres database.
+            password: str
+                Password for this username.
+            database: str
+                Database to connect.
         """
         self.db = f"//{user}:{password}@{host}:{port}/{database}"
         self._engine = None
@@ -45,7 +45,7 @@ class PostgresClient:
         Returns
         -------
             Engine: object
-                manages DB connections.
+                Manages DB connections.
         """
         db_uri = f"postgresql:{self.db}"
         if not self._engine:
@@ -53,12 +53,12 @@ class PostgresClient:
         return self._engine
 
     def _connect(self):
-        """Connects to a DB.
+        """Connects to DB.
 
         Returns
         -------
             Connection: object
-                proxy object for DB connections.
+                Proxy object for DB connections.
         """
         return self._get_engine().connect()
 
@@ -73,7 +73,7 @@ class PostgresClient:
         Returns
         -------
             list:
-                list of columns.
+                List of columns.
         """
         if hasattr(cursor, "keys"):
             return cursor.keys()
@@ -85,9 +85,9 @@ class PostgresClient:
         Parameters
         ----------
             sql: str
-                str representing a query.
+                Represents a query.
             connection: object
-                proxy for DB connection.
+                Proxy for DB connection.
         Returns
         -------
             ResultProxy: object
@@ -102,14 +102,14 @@ class PostgresClient:
 
         Parameters
         ----------
-            df: pandas DataFrame
-                DataFrame to be inserted into the DB.
+            df: pandas.DataFrame
+                Data to be inserted into the DB.
             table: str
-                table where DataFrame is inserted.
+                Table where DataFrame is inserted.
             if_exists: {"append", "fails", "replace"}
-                what to do in case that the table already exists in DB.
+                What to do in case that the table already exists in DB.
             index: bool
-                whether to consider the DataFrame index as a column or not.
+                Whether to consider the DataFrame index as a column or not.
         """
         connection = self._connect()
         with connection:
@@ -121,7 +121,7 @@ class PostgresClient:
         Returns
         -------
             df: pandas.DataFrame
-                result of the query in a pandas DataFrame.
+                Result of the query in a pandas DataFrame.
         """
         cursor = self.execute(*args, **kwargs)
         if not cursor:

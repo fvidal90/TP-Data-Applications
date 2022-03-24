@@ -1,4 +1,4 @@
-"""Stocks dag."""
+"""Dag to get and report anomaly days."""
 import os
 from datetime import datetime
 
@@ -7,9 +7,10 @@ import pandas as pd
 import sqlalchemy
 from airflow.models import DAG
 from airflow.operators.python import PythonOperator
+
 from packages.postgres_cli import PostgresClient
-from packages.utils import (extract_year, get_anomalous_days_airport,
-                            plot_chart_airport)
+from packages.utils import (extract_year, get_anomaly_days_airport,
+                            get_chart_airport)
 
 PG_USER = os.getenv("PG_USER")
 PG_PASSWORD = os.getenv("PG_PASSWORD")
@@ -19,6 +20,7 @@ PG_DB = os.getenv("PG_DB")
 
 
 def _get_delay_average_and_count(ds, bucket="flights-fer"):
+    """Gets metrics per (airport, year)."""
     year = extract_year(ds)
     s3_client = boto3.client("s3")
     response = s3_client.get_object(Bucket=bucket, Key=f"raw/{year}.csv")
@@ -38,7 +40,8 @@ def _get_delay_average_and_count(ds, bucket="flights-fer"):
         print("Data already exists! Nothing to do...")
 
 
-def _get_anomalous_days(ds):
+def _get_anomaly_days(ds):
+    """Gets anomaly days per (airport, year)."""
     year = extract_year(ds)
     pg = PostgresClient(PG_HOST, PG_PORT, PG_USER, PG_PASSWORD, PG_DB)
     df_delay = pg.to_frame(
@@ -47,7 +50,7 @@ def _get_anomalous_days(ds):
     df_delay["fl_date"] = pd.to_datetime(df_delay.fl_date)
     df_anomalies = pd.DataFrame()
     for airport in sorted(set(df_delay.origin.values)):
-        df_airport = get_anomalous_days_airport(df_delay, airport)
+        df_airport = get_anomaly_days_airport(df_delay, airport)
         df_anomalies = pd.concat([df_anomalies, df_airport])
 
     pg = PostgresClient(PG_HOST, PG_PORT, PG_USER, PG_PASSWORD, PG_DB)
@@ -59,7 +62,8 @@ def _get_anomalous_days(ds):
         print("Data already exists! Nothing to do...")
 
 
-def _plot_anomalous_days(ds):
+def _report_anomaly_days(ds, bucket="flights-fer"):
+    """Reports anomaly days per (airport, year)."""
     year = extract_year(ds)
     pg = PostgresClient(PG_HOST, PG_PORT, PG_USER, PG_PASSWORD, PG_DB)
     df_complete = pg.to_frame(
@@ -73,7 +77,7 @@ def _plot_anomalous_days(ds):
     )
     df_complete["fl_date"] = pd.to_datetime(df_complete.fl_date)
     for airport in sorted(set(df_complete.origin.values)):
-        plot_chart_airport(df_complete, airport, year)
+        get_chart_airport(df_complete, airport, year, bucket)
 
 
 default_args = {
@@ -98,19 +102,19 @@ with DAG(
 
     get_anomalies_task = PythonOperator(
         task_id=f"get_anomalies_task",
-        python_callable=_get_anomalous_days,
+        python_callable=_get_anomaly_days,
         op_kwargs={
             "ds": "{{ ds }}",
         },
     )
 
-    plot_anomalies_task = PythonOperator(
-        task_id=f"plot_anomalies_task",
-        python_callable=_plot_anomalous_days,
+    report_anomalies_task = PythonOperator(
+        task_id=f"report_anomalies_task",
+        python_callable=_report_anomaly_days,
         op_kwargs={
             "ds": "{{ ds }}",
         },
     )
 
     get_delay_task.set_downstream(get_anomalies_task)
-    get_anomalies_task.set_downstream(plot_anomalies_task)
+    get_anomalies_task.set_downstream(report_anomalies_task)
