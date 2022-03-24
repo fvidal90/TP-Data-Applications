@@ -22,8 +22,8 @@ class DelayMetrics(Base):
     __tablename__ = "delay_metrics"
     fl_date = Column(Date, primary_key=True)
     origin = Column(String, primary_key=True)
-    dep_delay_mean = Column(Float)
     dep_delay_count = Column(Integer)
+    dep_delay_mean = Column(Float)
 
 
 class DelayAnomalies(Base):
