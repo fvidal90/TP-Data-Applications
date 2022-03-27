@@ -36,6 +36,8 @@ Bucket llamado `flights-fer` con 2 keys principales:
 - reports: lugar donde se guardan los gráficos obtenidos. los mismos se guardan de la siguiente manera: 
 `flights-fer/reports/{year}/{airport}/fig-{airport}-{year}.png`
 
+Ejemplos de reportes se encuentran en la carperta `s3_reports_examples`
+
 Cifrado: SSE-S3.
 
 ### VPC
