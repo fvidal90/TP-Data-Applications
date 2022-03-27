@@ -6,7 +6,7 @@ En el presente repositorio se busca resolver un problema de Machine Learning com
 
 Dado el siguiente [conjunto de datos](https://www.kaggle.com/datasets/yuanyuwendymu/airline-delay-and-cancellation-data-2009-2018),
 Se busca, por año y aeropuerto, detectar días anómalos, en donde el concepto de anomalía viene dado por la demora 
-promedio en la partido de los vuelos del día.
+promedio en la partida de los vuelos del día.
 
 ### Obtención de días anómalos
 
@@ -36,7 +36,7 @@ Bucket llamado `flights-fer` con 2 keys principales:
 - reports: lugar donde se guardan los gráficos obtenidos. los mismos se guardan de la siguiente manera: 
 `flights-fer/reports/{year}/{airport}/fig-{airport}-{year}.png`
 
-Ejemplos de reportes se encuentran en la carperta `s3_reports_examples`
+Ejemplos de reportes se encuentran en la carpeta `s3_reports_examples`
 
 Cifrado: SSE-S3.
 
@@ -126,7 +126,7 @@ correspondientes para acceder a la cuenta de aws.
 Pasos:
 - Creación del bucket:
 ```aws s3api create-bucket --bucket flights-fer --region us-east-1```
-- Encripción del bucket con SSE-S3:
+- Encriptado del bucket con SSE-S3:
 ```
 aws s3api put-bucket-encryption --bucket flights-fer --server-side-encryption-configuration '{
     "Rules": [
@@ -206,9 +206,9 @@ se puede hacer una más específica)
 - Creación de grupo de subredes:
   - En RDS - grupo de subredes, `crear grupo de subredes de base de datos`
   - Elegir la VPC creada anteriormente.
-  - Seleccionar las zonas de diponibilidad `us-east-1a` y `us-east-1b`
+  - Seleccionar las zonas de disponibilidad `us-east-1a` y `us-east-1b`
   - Seleccionar las subredes correspondientes a RDS (cuidado: están por ID, no por nombre. 
-Tener abierta otra ventana donde están los nombres y sus respectivos IDs)
+Tener abierta otra ventana donde están los nombres y sus respectivos ID)
 - Creación de base de datos:
   - En RDS - Bases de datos, `Crear base de datos`
   - Configuración:
@@ -408,7 +408,7 @@ por ID, por lo que se necesita tener en otra pestaña la sección VPC abierta.
       - Color: `origin`
     - Crear parámetros:
       - Similar al caso anterior
-    - Añadir control a los parámteros:
+    - Añadir control a los parámetros:
       - En cada uno de los parámetros, seleccionar Añadir control:
         - StartDate:
           - Nombre para mostrar: `start date`
