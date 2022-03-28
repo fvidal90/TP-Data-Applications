@@ -1,8 +1,7 @@
 """Script to create tables in Postgres."""
 import os
 
-from sqlalchemy import (Boolean, Column, Date, Float, Integer, String,
-                        create_engine)
+from sqlalchemy import Boolean, Column, Date, Float, Integer, String, create_engine
 from sqlalchemy.orm import declarative_base
 
 PG_USER = os.getenv("PG_USER")

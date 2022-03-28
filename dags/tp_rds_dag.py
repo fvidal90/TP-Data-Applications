@@ -9,8 +9,7 @@ from airflow.models import DAG
 from airflow.operators.python import PythonOperator
 
 from packages.postgres_cli import PostgresClient
-from packages.utils import (extract_year, get_anomaly_days_airport,
-                            get_chart_airport)
+from packages.utils import extract_year, get_anomaly_days_airport, get_chart_airport
 
 PG_USER = os.getenv("PG_USER")
 PG_PASSWORD = os.getenv("PG_PASSWORD")
