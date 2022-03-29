@@ -25,7 +25,7 @@ rm .env_github
 yum install git -y
 git config --global user.name "$GITHUB_USER"
 git config --global user.email "$GITHUB_EMAIL"
-git clone "https://$GITHUB_TOKEN@github.com/$GITHUB_USER/TP-Data-Applications.git"
+git clone "https://$GITHUB_TOKEN@github.com/fvidal90/TP-Data-Applications.git"
 
 cd TP-Data-Applications
 git checkout $GITHUB_BRANCH
