@@ -1,0 +1,156 @@
+black y isort
+
+kaggle datasets download yuanyuwendymu/airline-delay-and-cancellation-data-2009-2018 -f 2009.csv
+kaggle datasets download -d yuanyuwendymu/airline-delay-and-cancellation-data-2009-2018
+
+pip install kaggle
+
+
+import pandas as pd
+df = pd.read_csv('files/2018.csv')
+df.groupby(['FL_DATE','ORIGIN']).DEP_DELAY.mean()
+
+pip install scikit-learn
+
+for airport in set(df.ORIGIN.values):
+    print(airport)
+    df_airport = df[df.ORIGIN==airport]
+    print(df.groupby('FL_DATE').count())
+
+print(len(set(df.ORIGIN.values)))
+
+df.groupby(['ORIGIN']).count().reset_index().sort_values('FL_DATE', ascending=False)
+df.groupby(['ORIGIN']).count().reset_index().sort_values('FL_DATE', ascending=False).head().ORIGIN.values
+
+df[df.ORIGIN=='ATL']
+
+df[df.ORIGIN=='ATL'].groupby('FL_DATE').ORIGIN.count().reset_index().sort_values('ORIGIN',ascending=False)
+df[df.ORIGIN=='ORD'].groupby('FL_DATE').ORIGIN.count().reset_index().sort_values('ORIGIN',ascending=False)
+
+for ori in df.groupby(['ORIGIN']).count().reset_index().sort_values('FL_DATE', ascending=False).head(20).ORIGIN.values:
+    print(ori)
+    print(df[df.ORIGIN==ori].groupby('FL_DATE').ORIGIN.count().reset_index().sort_values('ORIGIN',ascending=False).head(20))
+
+from anomalies import get_delay_average
+df = get_delay_average(2015)
+X = [[x] for x in df.DEP_DELAY.values]
+
+from sklearn.neighbors import LocalOutlierFactor
+from sklearn import linear_model
+clf = linear_model.SGDOneClassSVM(random_state=42)
+
+clf.fit(X)
+df["prediction"]=clf.predict(X)
+
+df["prediction"]=clf.fit_predict(X)
+
+df.groupby("prediction").DEP_DELAY.max()
+df.groupby("prediction").DEP_DELAY.min()
+df.groupby("prediction").DEP_DELAY.mean()
+df.groupby("prediction").DEP_DELAY.count()
+
+from sklearn.ensemble import IsolationForest
+clf = IsolationForest(random_state=42,contamination=0.05)
+
+https://coderzcolumn.com/tutorials/machine-learning/scikit-learn-sklearn-anomaly-detection-outliers-detection
+
+Para crear bucket:
+https://docs.aws.amazon.com/cli/latest/reference/s3api/create-bucket.html
+(aws s3api ...)
+aws s3api create-bucket --bucket flights-fer
+
+s3 ls files (not bucket)
+https://stackoverflow.com/questions/36813327/how-to-display-only-files-from-aws-s3-ls-command
+aws s3 ls s3://flights-fer --recursive | awk '{print $4}'
+
+s3 delete bucket
+https://docs.aws.amazon.com/AmazonS3/latest/userguide/delete-bucket.html
+aws s3 rb s3://flights-fer --force
+
+para copiar
+aws s3 cp --recursive /Users/fernando.vidal/repos_fer/TP-Data-Applications/files/ s3://flights-fer/tp/
+aws s3 sync /Users/fernando.vidal/repos_fer/TP-Data-Applications/files/ s3://flights-fer/tp/
+https://stackoverflow.com/questions/64728076/aws-s3-cp-vs-aws-s3-sync-behavior-and-cost
+
+leer csv de s3 (https://towardsdatascience.com/reading-and-writing-files-from-to-amazon-s3-with-pandas-ccaf90bfe86c)
+import boto3
+s3_client = boto3.client("s3")
+response = s3_client.get_object(Bucket='flights-fer', Key="tp/2009.csv")
+import pandas as pd
+df = pd.read_csv(response.get("Body"))
+
+postgresql
+https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/USER_ConnectToPostgreSQLInstance.html
+https://aws.amazon.com/es/getting-started/hands-on/create-connect-postgresql-db/
+
+airflow and kubernetes
+https://dev.to/aws-builders/apache-airflow-in-eks-cluster-dgo
+https://www.youtube.com/watch?v=GDOw8ByzMyY
+https://aws.amazon.com/es/premiumsupport/knowledge-center/eks-persistent-storage/
+https://kubernetes.io/docs/concepts/storage/persistent-volumes/#persistentvolumeclaims
+
+cluster en eks
+https://docs.aws.amazon.com/es_es/eks/latest/userguide/getting-started-console.html
+
+database-1
+
+from sqlalchemy import create_engine
+
+from models import Base
+
+PG_USER = "postgres"
+PG_PASSWORD = "postgres"
+PG_HOST = "database-1.c55j4zcytcxk.us-east-1.rds.amazonaws.com"
+PG_PORT = 5432
+PG_DB = "database1"
+URI = f"postgresql://{PG_USER}:{PG_PASSWORD}@{PG_HOST}:{PG_PORT}/{PG_DB}"
+
+
+def main():
+    """Program entrypoint."""
+    engine = create_engine(URI, echo=True)
+    Base.metadata.create_all(engine)
+
+from sqlalchemy import Column, Integer, String, Date, Float, UniqueConstraint
+from sqlalchemy.orm import declarative_base
+
+PG_TABLE = "table-fer"
+
+Base = declarative_base()
+
+
+class StockValue(Base):
+    """Stock value data model."""
+    __tablename__ = PG_TABLE
+    id = Column(Integer, primary_key=True)
+    symbol = Column(String)
+    date = Column(Date)
+    open = Column(Float)
+    high = Column(Float)
+    low = Column(Float)
+    close = Column(Float)
+    __table_args__ = (UniqueConstraint("symbol", "date"),)
+    def __repr__(self):
+        return f"<StockValue(symbol='{self.symbol}', ...)>"
+
+insertar en postgres
+1) se la banca con '2021-01-01' o con to_datetime
+2) las columnas tienen que ser minúscula
+3) las booleanas tienen que ser True o False
+4) anomalies: df.anomaly.astype(bool)
+
+Postgres en mac
+    Brew
+        /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+    brew install postgresql
+    --- gem install pg (POR AHORA NO)
+
+
+.env
+echo -e "AIRFLOW_UID=$(id -u)\nAIRFLOW_GID=0\nPG_PORT=5432\nPG_USER=postgres\nPG_PASSWORD=postgres\nPG_HOST=database-tp.cedqx5id3hho.us-east-1.rds.amazonaws.com\nPG_DB=database_tp" > .env
+
+    PG_USER: ${PG_USER}
+    PG_PASSWORD: ${PG_PASSWORD}
+    PG_HOST: ${PG_HOST}
+    PG_PORT: ${PG_PORT}
+    PG_DB: ${PG_DB}

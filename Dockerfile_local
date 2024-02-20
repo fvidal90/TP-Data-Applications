@@ -1,0 +1,23 @@
+FROM ubuntu:20.04
+# ADD . /code
+RUN mkdir /code
+WORKDIR code
+RUN apt update && apt-get -y install python3-pip && apt install --assume-yes vim
+RUN pip install apache-airflow
+ENV AIRFLOW_HOME /code/airflow
+RUN airflow db init
+COPY ./files /code/files
+RUN mkdir /code/metrics
+RUN mkdir /code/outliers
+RUN mkdir /code/reports
+RUN pip install boto3==1.21.8
+RUN pip install matplotlib==3.5.1
+RUN pip install pandas==1.4.1
+RUN pip install psycopg2-binary==2.9.3
+RUN pip install scikit-learn==1.0.2
+RUN pip install s3fs==2022.2.0
+# COPY /Users/fernando.vidal/.aws ~/.aws
+COPY ./dags /code/airflow/dags
+# RUN apt-get update && apt-get -y install libpq-dev gcc
+# RUN pip install -r requirements.txt
+# CMD ["python", "create_tables.py"]
